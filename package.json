@@ -1,0 +1,27 @@
+{
+  "name": "api-gateway-system-design",
+  "version": "1.0.0",
+  "description": "API Gateway with Routing, Authentication, Rate Limiting & Monitoring Dashboard — System Design Problem 26",
+  "main": "gateway/server.js",
+  "scripts": {
+    "start": "node gateway/server.js",
+    "start:gateway": "node gateway/server.js",
+    "start:users": "node microservices/userService.js",
+    "start:orders": "node microservices/orderService.js",
+    "start:payments": "node microservices/paymentService.js",
+    "dev": "node gateway/server.js"
+  },
+  "keywords": ["api-gateway", "microservices", "jwt", "rate-limiting", "system-design"],
+  "author": "System Design",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "http-proxy-middleware": "^3.0.3",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "uuid": "^11.1.0"
+  }
+}

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Gateway — Monitoring Dashboard</title>
+  <meta name="description" content="Real-time monitoring dashboard for API Gateway system design">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- ═══════ Header ═══════ -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+        </div>
+        <div>
+          <h1>API Gateway</h1>
+          <span class="logo-sub">System Design #26 — Monitoring Dashboard</span>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="status-badge" id="connectionStatus">
+        <span class="pulse"></span>
+        <span>Connected</span>
+      </div>
+      <div class="uptime-badge" id="uptimeBadge">Uptime: --</div>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- ═══════ Metric Cards ═══════ -->
+    <section class="metrics-grid">
+      <div class="metric-card card-purple">
+        <div class="metric-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">Total Requests</span>
+          <span class="metric-value" id="totalRequests">0</span>
+        </div>
+      </div>
+      <div class="metric-card card-green">
+        <div class="metric-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">Success Rate</span>
+          <span class="metric-value" id="successRate">100%</span>
+        </div>
+      </div>
+      <div class="metric-card card-blue">
+        <div class="metric-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">Avg Latency</span>
+          <span class="metric-value" id="avgLatency">0ms</span>
+        </div>
+      </div>
+      <div class="metric-card card-amber">
+        <div class="metric-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">Requests/sec</span>
+          <span class="metric-value" id="currentRps">0</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ Charts & Services Row ═══════ -->
+    <section class="charts-row">
+      <div class="panel chart-panel">
+        <div class="panel-header">
+          <h2>Request Throughput</h2>
+          <span class="panel-badge">Last 60s</span>
+        </div>
+        <div class="chart-container">
+          <canvas id="throughputChart"></canvas>
+        </div>
+      </div>
+      <div class="panel services-panel">
+        <div class="panel-header">
+          <h2>Service Health</h2>
+          <span class="panel-badge" id="serviceCount">0 services</span>
+        </div>
+        <div class="services-list" id="servicesList"></div>
+        <div class="panel-header" style="margin-top: 1rem;">
+          <h2>Circuit Breakers</h2>
+        </div>
+        <div class="circuit-list" id="circuitList"></div>
+      </div>
+    </section>
+
+    <!-- ═══════ Status Codes & Top Paths ═══════ -->
+    <section class="charts-row">
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Status Code Distribution</h2>
+        </div>
+        <div class="status-bars" id="statusBars"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Top Endpoints</h2>
+        </div>
+        <div class="top-paths" id="topPaths"></div>
+      </div>
+    </section>
+
+    <!-- ═══════ Request Log Table ═══════ -->
+    <section class="panel log-panel">
+      <div class="panel-header">
+        <h2>Recent Requests</h2>
+        <div class="log-controls">
+          <button class="log-btn active" data-filter="all">All</button>
+          <button class="log-btn" data-filter="success">2xx</button>
+          <button class="log-btn" data-filter="client-error">4xx</button>
+          <button class="log-btn" data-filter="server-error">5xx</button>
+        </div>
+      </div>
+      <div class="log-table-wrap">
+        <table class="log-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Method</th>
+              <th>Path</th>
+              <th>Status</th>
+              <th>Latency</th>
+              <th>User</th>
+              <th>Service</th>
+            </tr>
+          </thead>
+          <tbody id="logTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>API Gateway — System Design Problem 26 | Microservices Architecture & Backend Infrastructure</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
